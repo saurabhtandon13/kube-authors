@@ -1,0 +1,30 @@
+[
+    {
+        "name":"Emanuel Ortega",
+        "photo":"https://bootdey.com/img/Content/avatar/avatar7.png",
+        "phone":"+1 (987) 162 53 46",
+        "email" : "info@example.com"
+    },
+
+    {
+        "name":"Samantha Palson",
+        "photo":"https://bootdey.com/img/Content/avatar/avatar6.png",
+        "phone":"+5 (787) 233 65 90",
+        "email" : "info@example.com"
+    },
+
+    {
+        "name":"Emma Johnson",
+        "photo":"https://bootdey.com/img/Content/avatar/avatar2.png",
+        "phone":"+1 (390) 776 58 43",
+        "email" : "info@example.com"
+    },
+
+    {
+        "name":"William Smith",
+        "photo":"https://bootdey.com/img/Content/avatar/avatar3.png",
+        "phone":"+1 (987) 162 53 46",
+        "email" : "info@example.com"
+    }
+
+]
