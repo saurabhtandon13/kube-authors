@@ -19,14 +19,22 @@ spec:
     volumeMounts:
       - name: docker-config
         mountPath: /kaniko/.docker
+  - name: kubectl
+    image: gcr.io/cloud-builders/kubectl
+    command:
+    - cat
+    tty: true
   restartPolicy: Never
   volumes:
     - name: docker-config
       configMap:
         name: docker-config
+  
 """
     }
   }
+
+
   stages {
     stage('Clone Authors Repo') {
         steps{
@@ -40,5 +48,43 @@ spec:
         }
        }
     }
+
+    stage('Deploy Smoke Green'){
+        steps{
+            // patching green zone
+            // sh """kubectl patch svc  "${PROD_BLUE_SERVICE}" -p '{\"spec\":{\"selector\":{\"app\":\"taxicab\",\"version\":\"${BUILD_NUMBER}\"}}}'"""
+           container('kubectl'){
+            sh """
+                kubectl patch deployment authors-green -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"kubeworkshop\",\"image\":\"robinfoe/kubeworkshop:${BUILD_NUMBER}\"}]}}}}'
+                kubectl scale --replicas=1 deployment authors-green
+                kubectl wait --for=condition=ready pod -l app=authors-green --timeout=60s
+            """
+           }
+        }
+        
+    }
+
+
+    stage('Smoke Test'){
+        steps{
+            input 'Proceed to Production ?'
+        }
+    }
+
+    stage('Deploy to Prod') {
+      
+      steps {
+          container('kubectl'){
+        sh """
+                kubectl patch deployment authors-blue -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"kubeworkshop\",\"image\":\"robinfoe/kubeworkshop:${BUILD_NUMBER}\"}]}}}}'
+                kubectl scale --replicas=1 deployment authors-blue
+                kubectl wait --for=condition=ready pod -l app=authors-blue --timeout=60s
+                kubectl scale --replicas=0 deployment authors-green
+            """
+          }
+      }
+    }
+
+
   }
 }
