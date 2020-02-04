@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: authors-blue
+  name: authors-blue
+  namespace: workshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authors-blue
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: authors-blue
+    spec:
+      containers:
+      - image: robinfoe/kubeworkshop:11
+        name: kubeworkshop
+        resources: {}
+status: {}

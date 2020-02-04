@@ -9,8 +9,8 @@ export default class Authors extends Component {
         super(props)
         this.state = {
             selectedAuthor: 1,
-            // enableSocial : false
-            enableSocial : true
+            enableSocial : false
+            //enableSocial : true
           }
       
     }
