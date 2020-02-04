@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docker-config
+  namespace: workshop
+data:
+  config.json: |-
+    {
+        "auths": {
+            "https://index.docker.io/v1/": {
+                "auth": "cm9iaW5mb2U6OTlhNWZjMGEtNzkwYy00MmYwLTk4NjUtNTJlYzMzODcyZWIz"
+            }
+        },
+        "HttpHeaders": {
+            "User-Agent": "Docker-Client/19.03.5 (darwin)"
+        },
+        "experimental": "disabled",
+        "stackOrchestrator": "swarm"
+    }

@@ -1,0 +1,20 @@
+### This is sample to spin up pod for debugging purpose ###
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    args: ["--dockerfile=frontend/Dockerfile",
+            "--context=git://github.com/robinfoe/kube-authors.git#refs/heads/master",
+            "--destination=robinfoe/kubeworkshop:kv1"]
+    volumeMounts:
+      - name: docker-config
+        mountPath: /kaniko/.docker
+  restartPolicy: Never
+  volumes:
+    - name: docker-config
+      configMap:
+        name: docker-config
