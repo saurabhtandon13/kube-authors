@@ -4,7 +4,7 @@ metadata:
   creationTimestamp: null
   labels:
     app: authors
-  name: svc-authors
+  name: svc-authors-green
   namespace: workshop
 spec:
   ports:
@@ -12,5 +12,5 @@ spec:
     protocol: TCP
     targetPort: 3000
   selector:
-    app: authors-blue
+    app: authors-green
   type: ClusterIP
