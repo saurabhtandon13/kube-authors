@@ -1,9 +1,9 @@
 #FROM node:13-alpine
 FROM node:13-slim
 
-RUN mkdir -p /home/node/app/frontend/node_modules && chown -R node:node /home/node/app
-WORKDIR /home/node/app/frontend
-COPY --chown=node:node . .
+RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+WORKDIR /home/node/app
+COPY --chown=node:node ./frontend /home/node/app
 
 USER node
 # Environment variables
