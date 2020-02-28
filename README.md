@@ -111,5 +111,7 @@ and in jenkins setup
 ![jenkins setup 02](assets/image/jenkins-job-02.png)
 
 
+## Sample Screen
+- Current stat of applications
 
 

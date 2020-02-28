@@ -14,4 +14,6 @@ ENV PUBLIC_PATH "/"
 RUN npm install
 
 EXPOSE 3000
-CMD [ "npm", "start" ]
+
+## hack to ensure this works well when we use build pack, check package.json and script-hack.sh 
+CMD [ "npm", "dev" ]
