@@ -109,21 +109,4 @@ Clone this repository by running the below command
 
 
 
-##### Configure Jenkins for CI/CD pipeline
-Navigate to jenkins console ( http://jenkins.mkube ) , create a new pipepine job as per below
-
-![jenkins setup 01](assets/image/jenkins-job-01.png)
-
-and in jenkins setup
-- Definition : Pipeline script from SCM
-- SCM: git
-- repositories: https://github.com/robinfoe/kube-authors.git
-- Scripts path : scripts/pipeline/workshop-build.groovy
-
-![jenkins setup 02](assets/image/jenkins-job-02.png)
-
-
-## Sample Screen
-- Current stat of applications
-
 
