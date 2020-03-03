@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: build-push-authors
+spec:
+  inputs:
+    resources:
+    - name: workspace
+      type: git
+    params:
+    - name: pathToDockerFile
+      description: The path to the dockerfile to build
+      default: /workspace/workspace/Dockerfile
+    - name: pathToContext
+      description: The build context used by Kaniko (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+      default: /workspace/workspace
+    - name: imageTag
+      description: Image tagging
+      default: latest
+  outputs:
+    resources:
+    - name: builtImage
+      type: image
+  steps:
+  - name: build-and-push
+    image: gcr.io/kaniko-project/executor:v0.15.0
+    # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
+   # env:
+   # - name: "DOCKER_CONFIG"
+   #   value: "/tekton/home/.docker/"
+    volumeMounts:
+        - name: "docker-conf"
+          mountPath: /kaniko/.docker
+    command:
+    - /kaniko/executor
+    args:
+    - --dockerfile=$(inputs.params.pathToDockerFile)
+    - --destination=$(outputs.resources.builtImage.url):$(inputs.params.imageTag)
+    - --context=$(inputs.params.pathToContext)
+  volumes:
+    - name: "docker-conf"
+      configMap:
+        name: "docker-config"

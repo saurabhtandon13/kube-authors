@@ -1,0 +1,47 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: release-blue
+spec:
+  inputs:
+    resources:
+    - name: builtImage
+      type: image
+    params:
+    - name: imageTag
+      description: Image tagging
+      default: latest
+  steps:
+  - name: patch-blue
+    image: lachlanevenson/k8s-kubectl:v1.17.3
+    command: ["kubectl"]
+    args:
+    - "patch" 
+    - "deployment" 
+    - "authors-blue" 
+    - "-p {\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"workshop\",\"image\":\"$(inputs.resources.builtImage.url):$(inputs.params.imageTag)\"}]}}}}"
+  - name: start-blue-pod 
+    image: lachlanevenson/k8s-kubectl:v1.17.3
+    command: ["kubectl"]
+    args:
+    - "scale" 
+    - "--replicas=1" 
+    - "deployment"
+    - "authors-blue"
+  - name: wait-for-blue-ready
+    image: lachlanevenson/k8s-kubectl:v1.17.3
+    command: ["kubectl"]
+    args:
+    - "wait" 
+    - "--for=condition=ready" 
+    - "pod"
+    - "-l app=authors-blue" 
+    - "--timeout=60s" 
+  - name: stop-green-pod 
+    image: lachlanevenson/k8s-kubectl:v1.17.3
+    command: ["kubectl"]
+    args:
+    - "scale" 
+    - "--replicas=0" 
+    - "deployment"
+    - "authors-green"

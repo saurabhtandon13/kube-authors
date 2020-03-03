@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  generateName: task-release-blue-
+spec:
+  taskRef:
+    name: release-blue
+  inputs:
+    resources:
+    - name: builtImage
+      resourceRef:
+        name: authors-image
+    params:
+    - name: imageTag
+      value: v1

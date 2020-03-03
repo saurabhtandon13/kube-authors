@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  generateName: task-build-push
+spec:
+  taskRef:
+    name: build-push-authors
+  inputs:
+    resources:
+    - name: workspace
+      resourceRef:
+        name: authors-git
+    params:
+    - name: pathToDockerFile
+      value: ./frontend/Dockerfile
+    - name: pathToContext
+      value: /workspace/workspace/
+    - name: imageTag
+      value: v1
+  outputs:
+    resources:
+    - name: builtImage
+      resourceRef:
+        name: authors-image

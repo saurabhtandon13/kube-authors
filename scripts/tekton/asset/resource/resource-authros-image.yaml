@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: authors-image
+spec:
+  params:
+  - name: url
+    value: robinfoe/tektonauth
+  type: image

@@ -1,0 +1,75 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: authors-buildpack-pipeline
+spec:
+  resources:
+  - name: source-repo
+    type: git
+  - name: builtImage
+    type: image
+  params:
+  - name: imageTag
+    type: string
+    description: Image Tag Version
+    default: tek
+  - name: BUILDER_IMAGE
+    description: The image on which builds will run (must include v3 lifecycle and compatible buildpacks).
+    default: "cloudfoundry/cnb:0.0.53-bionic"
+  - name: USE_CRED_HELPERS
+    description: Use Docker credential helpers for Google's GCR, Amazon's ECR, or Microsoft's ACR.
+    default: "false"
+  - name: CACHE
+    description: The name of the persistent app cache volume
+    default: empty-dir
+  - name: USER_ID
+    description: The user ID of the builder image user
+    default: "1000"
+  - name: GROUP_ID
+    description: The group ID of the builder image user
+    default: "1000"
+  - name: SOURCE_SUBPATH
+    description: A subpath within the `source` input where the source to build is located.
+    default: "./frontend"
+    
+  tasks:
+  - name: init-grab-build-push
+    taskRef:
+      name: buildpack-push-authors
+    params:
+    - name: imageTag
+      value: "$(params.imageTag)"
+    - name: BUILDER_IMAGE
+      value: "$(params.BUILDER_IMAGE)"
+    - name: USE_CRED_HELPERS
+      value: "$(params.USE_CRED_HELPERS)"
+    - name: CACHE
+      value: "$(params.CACHE)"
+    - name: USER_ID
+      value: "$(params.USER_ID)"
+    - name: GROUP_ID
+      value: "$(params.GROUP_ID)"
+    - name: SOURCE_SUBPATH
+      value: "$(params.SOURCE_SUBPATH)"
+     
+
+    resources:
+      inputs:
+      - name: source
+        resource: source-repo
+      outputs:
+      - name: builtImage
+        resource: builtImage
+     
+  - name: proceed-deploy-smoke-green
+    runAfter: [init-grab-build-push]
+    taskRef:
+         name: deploy-smoke-green
+    resources:
+      inputs:
+      - name: builtImage
+        resource: builtImage
+    params:
+      - name: imageTag
+        value: "$(params.imageTag)"
+         

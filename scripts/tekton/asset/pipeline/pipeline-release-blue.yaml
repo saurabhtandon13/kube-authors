@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Pipeline
+metadata:
+  name: authors-release-prod-pipeline
+spec:
+  resources:
+  - name: builtImage
+    type: image
+  params:
+  - name: imageTag
+    type: string
+    description: Image Tag Version
+    default: GA
+  tasks:
+  - name: proceed-release-blue
+    taskRef:
+         name: release-blue
+    resources:
+      inputs:
+      - name: builtImage
+        resource: builtImage
+    params:
+      - name: imageTag
+        value: "$(params.imageTag)"

@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  generateName: task-deploy-smoke-green-
+spec:
+  taskRef:
+    name: deploy-smoke-green
+  inputs:
+    resources:
+    - name: builtImage
+      resourceRef:
+        name: authors-image
+    params:
+    - name: imageTag
+      value: v1

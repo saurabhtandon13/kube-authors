@@ -1,0 +1,145 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: buildpack-push-authors
+spec:
+  inputs:
+    resources:
+    - name: source
+      type: git
+    params:
+    - name: BUILDER_IMAGE
+      description: The image on which builds will run (must include v3 lifecycle and compatible buildpacks).
+      default: "cloudfoundry/cnb:0.0.53-bionic"
+    - name: USE_CRED_HELPERS
+      description: Use Docker credential helpers for Google's GCR, Amazon's ECR, or Microsoft's ACR.
+      default: "false"
+    - name: CACHE
+      description: The name of the persistent app cache volume
+      default: empty-dir
+    - name: USER_ID
+      description: The user ID of the builder image user
+      default: "1000"
+    - name: GROUP_ID
+      description: The group ID of the builder image user
+      default: "1000"
+    - name: SOURCE_SUBPATH
+      description: A subpath within the `source` input where the source to build is located.
+      default: ""
+    - name: imageTag
+      description: Image tagging
+      default: latest
+  outputs:
+    resources:
+    - name: builtImage
+      type: image
+  stepTemplate:
+    env:
+    - name: CNB_PLATFORM_API
+      value: "0.2"
+
+  steps:
+  - name: prepare
+    image: alpine
+    imagePullPolicy: Always
+    command: ["/bin/sh"]
+    args:
+    - "-c"
+    - >
+        mkdir -p /workspace/source &&
+        chown -R "$(inputs.params.USER_ID):$(inputs.params.GROUP_ID)" "/tekton/home" &&
+        chown -R "$(inputs.params.USER_ID):$(inputs.params.GROUP_ID)" "/layers" &&
+        chown -R "$(inputs.params.USER_ID):$(inputs.params.GROUP_ID)" "/cache" &&
+        chown -R "$(inputs.params.USER_ID):$(inputs.params.GROUP_ID)" "/workspace/source"
+    volumeMounts:
+    - name: layers-dir
+      mountPath: /layers
+    - name: $(inputs.params.CACHE)
+      mountPath: /cache
+
+
+  - name: detect
+    image: $(inputs.params.BUILDER_IMAGE)
+    imagePullPolicy: Always
+    command: ["/cnb/lifecycle/detector"]
+    args:
+    - "-app=/workspace/source/$(inputs.params.SOURCE_SUBPATH)"
+    - "-group=/layers/group.toml"
+    - "-plan=/layers/plan.toml"
+    volumeMounts:
+    - name: layers-dir
+      mountPath: /layers
+
+  - name: analyze
+    image: $(inputs.params.BUILDER_IMAGE)
+    imagePullPolicy: Always
+    command: ["/cnb/lifecycle/analyzer"]
+    args:
+    - "-layers=/layers"
+    - "-helpers=$(inputs.params.USE_CRED_HELPERS)"
+    - "-group=/layers/group.toml"
+    - "-cache-dir=/cache"
+    - "$(outputs.resources.builtImage.url)"
+    volumeMounts:
+    - name: $(inputs.params.CACHE)
+      mountPath: /cache
+    - name: layers-dir
+      mountPath: /layers
+
+  - name: restore
+    image: $(inputs.params.BUILDER_IMAGE)
+    imagePullPolicy: Always
+    command: ["/cnb/lifecycle/restorer"]
+    args:
+    - "-group=/layers/group.toml"
+    - "-layers=/layers"
+    - "-cache-dir=/cache"
+    volumeMounts:
+    - name: $(inputs.params.CACHE)
+      mountPath: /cache
+    - name: layers-dir
+      mountPath: /layers
+
+  - name: build
+    image: $(inputs.params.BUILDER_IMAGE)
+    imagePullPolicy: Always
+    command: ["/cnb/lifecycle/builder"]
+    args:
+    - "-app=/workspace/source/$(inputs.params.SOURCE_SUBPATH)"
+    - "-layers=/layers"
+    - "-group=/layers/group.toml"
+    - "-plan=/layers/plan.toml"
+    volumeMounts:
+    - name: layers-dir
+      mountPath: /layers
+  
+  
+  - name: export
+    image: $(inputs.params.BUILDER_IMAGE)
+    imagePullPolicy: Always
+    command: ["/cnb/lifecycle/exporter"]
+    args:
+    - "-app=/workspace/source/$(inputs.params.SOURCE_SUBPATH)"
+    - "-layers=/layers"
+    - "-helpers=true"
+    - "-group=/layers/group.toml"
+    - "-cache-dir=/cache"
+    - "$(outputs.resources.builtImage.url):$(inputs.params.imageTag)"
+    volumeMounts:
+    - name: layers-dir
+      mountPath: /layers
+    - name: $(inputs.params.CACHE)
+      mountPath: /cache
+    - name: "docker-conf"
+      mountPath: /tekton/home/.docker
+
+
+  volumes:
+  - name: empty-dir
+    emptyDir: {}
+  - name: layers-dir
+    emptyDir: {}
+  - name: "docker-conf"
+    configMap:
+      name: "docker-config"
+

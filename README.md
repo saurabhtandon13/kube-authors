@@ -5,27 +5,39 @@ This repository holds a setup script that allows you to perform blue/green deplo
 # Pre-requisite
 I assume user have the following
 - Kubernetes Cluster ( this repo is tested againts minikube v1.6.2)
-- helm v.3.0.3
+- for jenkins pipeline, please go to [jenkins](./scripts/jenkins/README.md) section
+- for tekton pipeline, please go to [tekton](./scripts/tekton/README.md) section
+
+
 
 > [!NOTE]
 > **For minikube environment, i have configured dnsmasq that point to nginx ingress with suffix .mkube**
 
 
-
 # Description
+
+
+
 The repo use the following tech stack
+
+### Jenkins Pipeline
 - [Jenkins ( from helm stable/jenkins v1.9.16)](https://hub.helm.sh/charts/stable/jenkins)
 - [kaniko container v0.16.0](https://github.com/GoogleContainerTools/kaniko) 
 - [kubectl container](https://www.google.com/search?q=google+cloud+builder+kubectl&rlz=1C5CHFA_enSG883SG883&oq=google+cloud+builder+kubectl&aqs=chrome..69i57j0j69i64j69i60l2.6264j0j7&sourceid=chrome&ie=UTF-8)
 
+### Tekton Pipeline
+- [Tekton v0.10.1](https://github.com/tektoncd/pipeline)
+- [Tekton Dashboard](https://github.com/tektoncd/dashboard)
+- [CloudFoundry CNB / Buildpack tag - 0.0.53-bionic ](https://hub.docker.com/r/cloudfoundry/cnb)
+
 The script will setup the below url 
-- http://jenkins.mkube - access to jenkins console
+- http://jenkins.mkube - access to jenkins console ( if jenkins section is applied)
+- http://tekton.mkube - access to jenkins console ( if tekton section is applied)
 - http://dashboard.mkube - access to kubernetes console
 - http://authors.mkube - access to Authors app Blue zone
 - http://smoke.authors.mkube - access to Authors app Green zone
 
 # Setup
-
 Clone this repository by running the below command 
 
     ## shell

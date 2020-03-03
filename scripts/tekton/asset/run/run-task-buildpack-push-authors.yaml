@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1alpha1
+kind: TaskRun
+metadata:
+  generateName: task-buildpack-push
+spec:
+  taskRef:
+    name: buildpack-push-authors
+  inputs:
+    resources:
+    - name: source
+      resourceRef:
+        name: authors-git
+    params:
+    - name: BUILDER_IMAGE
+      value: "cloudfoundry/cnb:0.0.53-bionic"
+    - name: SOURCE_SUBPATH
+      value: "./frontend"
+    - name: imageTag
+      value: tekv1
+  outputs:
+    resources:
+    - name: builtImage
+      resourceRef:
+        name: authors-image
