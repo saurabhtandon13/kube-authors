@@ -73,3 +73,8 @@ make sure you fill in the right value in the field.
 
 
 ![tekton01](../../assets/image/tekton-03.png)
+
+
+Sample successfull pipeline runs
+
+![tekton01](../../assets/image/tekton-04.png)
