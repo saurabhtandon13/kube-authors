@@ -12,9 +12,7 @@ I assume user have perform the following
 
 # Setup
 
-## Deploy jenkins
 
-##### Navigate to namespace
     ## Navigate to kube-authors folder 
     cd %{WORKSPACE_HOME}/kube-authors/ 
 
