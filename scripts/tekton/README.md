@@ -40,7 +40,7 @@ I assume user have perform the following
 
     kubectl apply -f scripts/kube/configmap/cm-docker-kaniko.yaml -n workshop
 
-##### Create RBAC for Jenkins and kubectl container
+##### Create RBAC for tekton 
 
     kubectl apply -f scripts/kube/role/role-cluster-admin-default.yaml 
 

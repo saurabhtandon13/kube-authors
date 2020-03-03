@@ -69,23 +69,25 @@ Clone this repository by running the below command
 
     kubectl config set-context --current --namespace=workshop
 
-
+<!--
 ##### Deploy Jenkins with helm
     helm install hl-jenkins stable/jenkins  --set rbac.create=false --set master.usePodSecurityContext=false --set master.adminPassword=password
 
     kubectl apply -f scripts/kube/ingress/ing-jenkins.yaml -n workshop
     
+-->
 
 ##### Create Kaniko Config map for docker push 
     kubectl apply -f scripts/kube/configmap/cm-docker-kaniko.yaml -n workshop
 
+<!--
 ##### Create RBAC for Jenkins and kubectl container
 
     kubectl apply -f scripts/kube/role/role-cluster-admin-jenkins.yaml 
     
     kubectl apply -f scripts/kube/role/role-cluster-admin-default.yaml 
 
-
+-->
 
 ##### Deploy App yaml
 
