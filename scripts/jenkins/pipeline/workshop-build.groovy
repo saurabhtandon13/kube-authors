@@ -38,13 +38,13 @@ spec:
   stages {
     stage('Clone Authors Repo') {
         steps{
-            git 'https://github.com/robinfoe/kube-authors.git'
+            git 'https://github.com/saurabhtandon13/kube-authors.git'
         }
     }
     stage('Build and Push') {
       steps {
         container("kaniko"){
-            sh '/kaniko/executor -f `pwd`/frontend/Dockerfile -c `pwd` --insecure --skip-tls-verify --destination=robinfoe/kubeworkshop:$BUILD_NUMBER --verbosity=debug'
+            sh '/kaniko/executor -f `pwd`/frontend/Dockerfile -c `pwd` --insecure --skip-tls-verify --destination=connect.kubelab.com:8433/kubeworkshop:$BUILD_NUMBER --verbosity=debug'
         }
        }
     }
@@ -55,7 +55,7 @@ spec:
             // sh """kubectl patch svc  "${PROD_BLUE_SERVICE}" -p '{\"spec\":{\"selector\":{\"app\":\"taxicab\",\"version\":\"${BUILD_NUMBER}\"}}}'"""
            container('kubectl'){
             sh """
-                kubectl patch deployment authors-green -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"kubeworkshop\",\"image\":\"robinfoe/kubeworkshop:${BUILD_NUMBER}\"}]}}}}'
+                kubectl patch deployment authors-green -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"kubeworkshop\",\"image\":\"connect.kubelab.com:8433/kubeworkshop:${BUILD_NUMBER}\"}]}}}}'
                 kubectl scale --replicas=1 deployment authors-green
                 kubectl wait --for=condition=ready pod -l app=authors-green --timeout=60s
             """
@@ -76,7 +76,7 @@ spec:
       steps {
           container('kubectl'){
         sh """
-                kubectl patch deployment authors-blue -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"kubeworkshop\",\"image\":\"robinfoe/kubeworkshop:${BUILD_NUMBER}\"}]}}}}'
+                kubectl patch deployment authors-blue -p '{\"spec\":{\"template\":{\"spec\":{\"containers\":[{\"name\":\"kubeworkshop\",\"image\":\"connect.kubelab.com:8433/kubeworkshop:${BUILD_NUMBER}\"}]}}}}'
                 kubectl scale --replicas=1 deployment authors-blue
                 kubectl wait --for=condition=ready pod -l app=authors-blue --timeout=60s
                 kubectl scale --replicas=0 deployment authors-green
